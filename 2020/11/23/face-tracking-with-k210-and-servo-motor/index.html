@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <meta name="author" content="Nhelv">
+
+
+
+
+
+<title>K210 面部追踪尝试 | Nhelv&#39;s Blog</title>
+
+
+
+    <link rel="icon" href="/favicon.ico">
+
+
+
+
+    <!-- stylesheets list from _config.yml -->
+    
+    <link rel="stylesheet" href="/css/style.css">
+    
+
+
+
+    <!-- scripts list from _config.yml -->
+    
+    <script src="/js/script.js"></script>
+    
+    <script src="/js/tocbot.min.js"></script>
+    
+
+
+
+    
+    
+        
+    
+
+
+<meta name="generator" content="Hexo 5.2.0"></head>
+<body>
+    <div class="wrapper">
+        <header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-header header-logo"><a href="/">Nhelv&#39;s Blog</a></div>
+            <div class="menu navbar-right">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+                <input id="switch_default" type="checkbox" class="switch_default">
+                <label for="switch_default" class="toggleBtn"></label>
+            </div>
+        </div>
+    </nav>
+
+    
+    <nav class="navbar-mobile" id="nav-mobile">
+        <div class="container">
+            <div class="navbar-header">
+                <div>
+                    <a href="/">Nhelv&#39;s Blog</a><a id="mobile-toggle-theme">·&nbsp;Light</a>
+                </div>
+                <div class="menu-toggle" onclick="mobileBtn()">&#9776; Menu</div>
+            </div>
+            <div class="menu" id="mobile-menu">
+                
+                    <a class="menu-item" href="/archives">Posts</a>
+                
+                    <a class="menu-item" href="/category">Categories</a>
+                
+                    <a class="menu-item" href="/tag">Tags</a>
+                
+            </div>
+        </div>
+    </nav>
+
+</header>
+<script>
+    var mobileBtn = function f() {
+        var toggleMenu = document.getElementsByClassName("menu-toggle")[0];
+        var mobileMenu = document.getElementById("mobile-menu");
+        if(toggleMenu.classList.contains("active")){
+           toggleMenu.classList.remove("active")
+            mobileMenu.classList.remove("active")
+        }else{
+            toggleMenu.classList.add("active")
+            mobileMenu.classList.add("active")
+        }
+    }
+</script>
+        <div class="main">
+            <div class="container">
+    
+    
+        <div class="post-toc">
+    <div class="tocbot-list">
+    </div>
+    <div class="tocbot-list-menu">
+        <a class="tocbot-toc-expand" onclick="expand_toc()">Expand all</a>
+        <a onclick="go_top()">Back to top</a>
+        <a onclick="go_bottom()">Go to bottom</a>
+    </div>
+</div>
+
+<script>
+    document.ready(
+        function () {
+            tocbot.init({
+                tocSelector: '.tocbot-list',
+                contentSelector: '.post-content',
+                headingSelector: 'h1, h2, h3, h4, h5',
+                collapseDepth: 1,
+                orderedList: false,
+                scrollSmooth: true,
+            })
+        }
+    )
+
+    function expand_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 6,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "collapse_toc()");
+        b.innerHTML = "Collapse all"
+    }
+
+    function collapse_toc() {
+        var b = document.querySelector(".tocbot-toc-expand");
+        tocbot.init({
+            tocSelector: '.tocbot-list',
+            contentSelector: '.post-content',
+            headingSelector: 'h1, h2, h3, h4, h5',
+            collapseDepth: 1,
+            orderedList: false,
+            scrollSmooth: true,
+        });
+        b.setAttribute("onclick", "expand_toc()");
+        b.innerHTML = "Expand all"
+    }
+
+    function go_top() {
+        window.scrollTo(0, 0);
+    }
+
+    function go_bottom() {
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+</script>
+    
+
+    
+    <article class="post-wrap">
+        <header class="post-header">
+            <h1 class="post-title">K210 面部追踪尝试</h1>
+            
+                <div class="post-meta">
+                    
+                        Author: <a itemprop="author" rel="author" href="/">Nhelv</a>
+                    
+
+                    
+                        <span class="post-time">
+                        Date: <a href="#">November 23, 2020&nbsp;&nbsp;21:21:02</a>
+                        </span>
+                    
+                    
+                        <span class="post-category">
+                    Category:
+                            
+                                <a href="/categories/%E5%B5%8C%E5%85%A5%E5%BC%8F/">嵌入式</a>
+                            
+                        </span>
+                    
+                </div>
+            
+        </header>
+
+        <div class="post-content">
+            <br>
+
+<h1 id="K210-面部追踪小尝试"><a href="#K210-面部追踪小尝试" class="headerlink" title="K210 面部追踪小尝试"></a>K210 面部追踪小尝试</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近偶然得知一个名为 <strong>K210</strong> 的 MCU，带有 RISC-V 架构的处理器，而且芯片中自带了一个自研的神经网络加速器，称为 KPU，允许进行高效卷积神经网络计算（据嘉楠官方数据，可以达到 0.8 TOPS）。于是萌生了一个用 K210 控制 SG90 伺服电机（舵机），上面放个摄像头，检测人脸然后伺服电机进行跟踪，拍照存储到 microSD 卡的奇怪想法；然后不知不觉间就下手了 Sipeed MaixBit，OV2460 摄像头，SG90 伺服电机以及一大堆乱七八糟的线缆面包板等配件（剁手ing）。用基于 MicroPython 的 MaixPy 进行开发（Python 真香<del>，才不是因为懒以及我在 MaixBit 上运行了好几个勘智的官方 C 例程都失败了</del>）。</p>
+<p>PS: 本文不会讲述如何给 MaixBit 刷入 MaixPy 固件以及 MaixPyIDE 的使用方法等，请参考<a target="_blank" rel="noopener" href="https://maixpy.sipeed.com/zh/">官方文档</a>。</p>
+<h2 id="硬件参数"><a href="#硬件参数" class="headerlink" title="硬件参数"></a>硬件参数</h2><h3 id="MaixBit"><a href="#MaixBit" class="headerlink" title="MaixBit"></a>MaixBit</h3><ul>
+<li>双核 64 bit RISC-V RV64IMAFDC CPU / 400MHz （集成双精度 FPU, AES, SHA256 加速）</li>
+<li>8MiB 64bit 片上 SRAM</li>
+<li>16 MiB Flash，板载 micro SDXC 接口 （最大支持 128 GiB）</li>
+<li>板载 DVP 摄像头接口和 LCD 接口，都是 24 Pin FPC 底座（0.5mm 间距）<br>更多信息可以参阅 <a target="_blank" rel="noopener" href="https://www.yahboom.net/xiazai/Maix_Bit/Download/MaixBit_Datasheet.pdf">Sipeed MaixBit Datasheet</a>。</li>
+</ul>
+<h3 id="OV2640"><a href="#OV2640" class="headerlink" title="OV2640"></a>OV2640</h3><ul>
+<li>320 × 240 分辨率</li>
+<li>200W 像素</li>
+<li>DVP 接口（FPC 24 Pin 0.5mm）</li>
+<li>支持 YUV422 颜色模式</li>
+<li>手动变焦<br>PS: 其实官方对 OV5640 的支持要更完善一点点，支持自动变焦和 RGB565 颜色模式（甚至可以配广角镜头），而且价格也没有比 OV2640 高到哪里去，打算以后弄个来玩玩（再次剁手预备）。<br>摄像头选型可以参考 <a target="_blank" rel="noopener" href="https://maixpy.sipeed.com/zh/develop_kit_board/get_hardware.html#%E6%91%84%E5%83%8F%E5%A4%B4">这个文档</a>。</li>
+</ul>
+<h3 id="SG90-伺服电机"><a href="#SG90-伺服电机" class="headerlink" title="SG90 伺服电机"></a>SG90 伺服电机</h3><ul>
+<li>无负载速度: 0.002s/度 （4.8V）</li>
+<li>堵转扭矩: 1.2-1.4 kg/cm（4.8V）</li>
+<li>死区设定: 7us （7 MHz）</li>
+<li>工作电压: 4.8 - 6V （我之前脑抽插到了 3.3V 供电上，死活不动。。所以使用前仔细阅读说明书是个好习惯）</li>
+<li>位置等级: 1024</li>
+<li>脉冲精度: 2us<br>该伺服电机需要 MCU 产生持续 20ms 的脉冲信号，以持续 0.5ms ~ 2.5ms 的高电平来控制角度，大概可以用下表来表示</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>高电平时间(ms)</th>
+<th>角度</th>
+<th>占空比(%)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.5</td>
+<td>0</td>
+<td>2.5</td>
+</tr>
+<tr>
+<td>1.0</td>
+<td>45</td>
+<td>5.0</td>
+</tr>
+<tr>
+<td>1.5</td>
+<td>90</td>
+<td>7.5</td>
+</tr>
+<tr>
+<td>2.0</td>
+<td>135</td>
+<td>10.0</td>
+</tr>
+<tr>
+<td>2.5</td>
+<td>180</td>
+<td>12.5</td>
+</tr>
+</tbody></table>
+<p>PS: 有关 PWM 的知识可以在网上搜索得到。我使用的驱动器是两个 SG90 组成的，可以实现水平 180 度和垂直 90 度的运动。</p>
+<h2 id="标题不存在"><a href="#标题不存在" class="headerlink" title="标题不存在"></a><del>标题不存在</del></h2><p>先上两张图吧，这是我搭好的（不要在意为什么这么丑）。</p>
+<p><img src="01.jpg" alt="?!"><br><img src="02.jpg" alt="?!!"></p>
+<h3 id="0x00"><a href="#0x00" class="headerlink" title="0x00"></a>0x00</h3><p>具体的 IO 定义可以参考上面的 MaixBit 规格文档，这里以 IO 编号说明。<br>水平伺服电机 PWM 连接 23 管脚，垂直伺服电机连接 22 管脚，两个电机均接入 MaixBit 的 5V 供电管脚（推荐使用额外的电源，如果是在电脑 USB 接口上调试且电机运动激烈，容易导致 MaixBit 欠压重启）。</p>
+<h3 id="0x01"><a href="#0x01" class="headerlink" title="0x01"></a>0x01</h3><p>因为个人的习惯（<del>懒得用配置文件</del>），开始先定义一些常量，初始化一些对象，方便后面的代码复用这些东西。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">CAMERA_VFLIP = <span class="number">1</span></span><br><span class="line">CAMERA_HMIRROR = <span class="number">1</span></span><br><span class="line">CAMERA_WIDTH = <span class="number">320</span></span><br><span class="line">CAMERA_HEIGHT = <span class="number">240</span></span><br><span class="line">CENTER_POINT_X = CAMERA_WIDTH / <span class="number">2</span></span><br><span class="line">CENTER_POINT_Y = CAMERA_HEIGHT / <span class="number">2</span></span><br><span class="line">CENTER_CIRCLE_RADIUS = <span class="number">10</span></span><br><span class="line">TRACE_DELTA_RADIUS = <span class="number">20</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Save photo to specific folder if detected a face, set empty to disable this function</span></span><br><span class="line">PHOTO_SAVE_PATH = <span class="string">&quot;/sd/images&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><code>VFLIP</code> 和 <code>HMIRROR</code> 用来控制摄像头的水平及垂直翻转，具体定义可参考 MaixPy 文档的 <a target="_blank" rel="noopener" href="https://maixpy.sipeed.com/zh/api_reference/machine_vision/sensor.html">sensor</a>。<br><code>CENTER_POINT_xxx</code> 指的是图像中心点的 X, Y 坐标，跟踪是以这个点为基准，要求目标的中心点在这个点的一定范围内。<br><code>TRACE_DELTA_RADIUS</code> 是目标中心点与图像中心点的允许位置偏差，当目标的中心点与图像中心点的距离超过这个值时，将控制伺服电机跟踪目标。<br><code>PHOTO_SAVE_PATH</code> 表示拍照时的存储路径，设为空可以关闭拍照的功能。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Initialize Servo Motor</span></span><br><span class="line"><span class="comment"># Horizontal</span></span><br><span class="line">SRVMOT_HORI_PIN = GPIO.GPIOHS23</span><br><span class="line">SRVMOT_HORI_MAX = <span class="number">13</span></span><br><span class="line">SRVMOT_HORI_MIN = <span class="number">3</span></span><br><span class="line">SRVMOT_HORI_DUTY_DEFAULT = (SRVMOT_HORI_MAX + SRVMOT_HORI_MIN) / <span class="number">2</span></span><br><span class="line">SRVMOT_HORI = PWM(</span><br><span class="line">    Timer(Timer.TIMER2, Timer.CHANNEL0, mode=Timer.MODE_PWM),</span><br><span class="line">    freq=<span class="number">50</span>,</span><br><span class="line">    duty=SRVMOT_HORI_DUTY_DEFAULT,</span><br><span class="line">    pin=SRVMOT_HORI_PIN)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Vertical</span></span><br><span class="line">SRVMOT_VECT_PIN = GPIO.GPIOHS22</span><br><span class="line">SRVMOT_VECT_MAX = <span class="number">12</span></span><br><span class="line">SRVMOT_VECT_MIN = <span class="number">4</span></span><br><span class="line">SRVMOT_VECT_DUTY_DEFAULT = (SRVMOT_VECT_MAX + SRVMOT_VECT_MIN) / <span class="number">2</span></span><br><span class="line">SRVMOT_VECT = PWM(</span><br><span class="line">    Timer(Timer.TIMER2, Timer.CHANNEL1, mode=Timer.MODE_PWM),</span><br><span class="line">    freq=<span class="number">50</span>,</span><br><span class="line">    duty=SRVMOT_VECT_DUTY_DEFAULT,</span><br><span class="line">    pin=SRVMOT_VECT_PIN)</span><br></pre></td></tr></table></figure>
+
+<p>定义伺服电机管脚和默认位置，设置电机的运行范围，最后用 PWM 类实现对特定管脚的 PWM 输出，控制对应的电机（由于我的垂直伺服电机比较特殊，最大角度只有 90 度但是 PWM 占空比还是 2.5 ~ 12.5，这部分需要根据自己的电机来实际确定）。<br>后续的初始化面部检测模型，摄像头，LCD 以及在 KPU 中加载模型，均为 MaixPy 中的官方例程，我就懒得打了，反正最后会放上完整代码。</p>
+<h3 id="0x02"><a href="#0x02" class="headerlink" title="0x02"></a>0x02</h3><p>我比较喜欢在用类，可以避免写出一大堆 <code>nonlocal</code> 啊，<code>global</code> 之类的东西。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FaceTrack</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="comment"># When we get current value of PWM object, it returns a integer,</span></span><br><span class="line">        <span class="comment"># so we need to use the variables ourselves to accurately control the servo motor.</span></span><br><span class="line">        self.h_duty = SRVMOT_HORI.duty()</span><br><span class="line">        self.v_duty = SRVMOT_VECT.duty()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Last saved time of camera auto shot</span></span><br><span class="line">        self.last_save_time = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># Last time when lost detected face</span></span><br><span class="line">        self.lost_face_time = <span class="number">0</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>为什么要自定义 <code>*_duty</code> 来存储 PWM 的占空比？直接用 <code>duty()</code> 读取占空比然后再计算不香吗？我之前也是这么想的，然后踩了坑，因为从 PWM 对象的 <code>duty()</code> 函数直接读取当前占空比时，返回的是一个整数，无法精确控制占空比（<del>伺服电机跟疯了一样要么不动要么直接瞬移</del>），此时需要自己定义变量来存储当前的精确占空比，方便精确控制伺服电机。</li>
+<li><code>last_save_time</code> 是最后一次拍照存储的时间戳，用来控制拍照间隔。</li>
+<li><code>lost_face_time</code> 是最后一次检测不到面部的时间戳，用以在丢失目标时让伺服电机复位。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">reset_servo_motor</span>(<span class="params">self</span>):</span></span><br><span class="line">    self.h_duty = SRVMOT_HORI.duty()</span><br><span class="line">    self.v_duty = SRVMOT_VECT.duty()</span><br><span class="line">    SRVMOT_HORI.duty(SRVMOT_HORI_DUTY_DEFAULT)</span><br><span class="line">    SRVMOT_VECT.duty(SRVMOT_VECT_DUTY_DEFAULT)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">move_hori_servo_motor</span>(<span class="params">self, delta: <span class="built_in">float</span></span>):</span></span><br><span class="line">    <span class="keyword">if</span> math.fabs(delta) &gt; TRACE_DELTA_RADIUS:</span><br><span class="line">        h_duty_delta = delta / CAMERA_WIDTH * \</span><br><span class="line">            (SRVMOT_HORI_MAX - SRVMOT_HORI_MIN) * <span class="number">0.2</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> CAMERA_HMIRROR == <span class="number">1</span>:</span><br><span class="line">            h_duty_delta = -h_duty_delta</span><br><span class="line">        print(<span class="string">&quot;Hduty delta: &#123;&#125;&quot;</span>.<span class="built_in">format</span>(h_duty_delta))</span><br><span class="line"></span><br><span class="line">        new_h_duty = self.h_duty + h_duty_delta</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> new_h_duty &lt;= SRVMOT_HORI_MAX <span class="keyword">and</span> new_h_duty &gt;= SRVMOT_HORI_MIN:</span><br><span class="line">            self.h_duty = new_h_duty</span><br><span class="line">            SRVMOT_HORI.duty(self.h_duty)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>reset_servo_motor</code> 用于复位电机位置，在丢失目标后调用</li>
+<li><code>move_hori_servo_motor</code> 控制水平电机，检测目标的水平位移并进行跟踪，其中 <code>h_duty_delta</code> 是经过计算转换后的 PWM 占空比改变量，其算法为计算水平改变量在图像大小中的比值，然后乘以水平电机的最大可用占空比与最小可用占空比的差值，最后乘以一个比例，经过我的多次测试这个值在我这里应设为 <code>0.2</code> 比较合适，既能保证平稳跟踪目标又不会使电机运动幅度过大；同理有一个 <code>move_vect_servo_motor</code> 控制垂直电机的运动。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loop</span>(<span class="params">self</span>):</span></span><br><span class="line">    <span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            gc.collect()</span><br><span class="line"></span><br><span class="line">            img = sensor.snapshot()  <span class="comment"># Read image from camera</span></span><br><span class="line">            codes = kpu.run_yolo2(FACE_DECT_TASK, img)  <span class="comment"># Run detection</span></span><br><span class="line">            <span class="keyword">if</span> codes:  <span class="comment"># Detected</span></span><br><span class="line">                <span class="comment"># Take photo and save if needed</span></span><br><span class="line">                <span class="keyword">if</span> PHOTO_SAVE_PATH <span class="keyword">and</span> utime.ticks_ms() - self.last_save_time &gt; <span class="number">2000</span>:</span><br><span class="line">                    fn = <span class="string">&quot;&#123;&#125;/&#123;&#125;.jpg&quot;</span>.<span class="built_in">format</span>(PHOTO_SAVE_PATH,</span><br><span class="line">                                            utime.ticks_ms())</span><br><span class="line">                    img.save(fn, quality=<span class="number">100</span>)</span><br><span class="line">                    print(<span class="string">&quot;Photo saved as &#123;&#125;&quot;</span>.<span class="built_in">format</span>(fn))</span><br><span class="line">                    self.last_save_time = utime.ticks_ms()</span><br><span class="line"></span><br><span class="line">                <span class="comment"># Draw center circle and delta range circle</span></span><br><span class="line">                img.draw_circle(CENTER_POINT_X, CENTER_POINT_Y,</span><br><span class="line">                                CENTER_CIRCLE_RADIUS)</span><br><span class="line">                img.draw_circle(CENTER_POINT_X, CENTER_POINT_Y,</span><br><span class="line">                                TRACE_DELTA_RADIUS)</span><br><span class="line"></span><br><span class="line">                <span class="keyword">for</span> code <span class="keyword">in</span> codes:</span><br><span class="line">                    x = code.x()</span><br><span class="line">                    y = code.y()</span><br><span class="line">                    w = code.w()</span><br><span class="line">                    h = code.h()</span><br><span class="line">                    img.draw_rectangle(x, y, w, h)</span><br><span class="line"></span><br><span class="line">                    x_center = <span class="built_in">int</span>(x + w / <span class="number">2</span>)</span><br><span class="line">                    y_center = <span class="built_in">int</span>(y + h / <span class="number">2</span>)</span><br><span class="line">                    img.draw_line(x_center, y, x_center, y + h)</span><br><span class="line">                    img.draw_line(x, y_center, x + w, y_center)</span><br><span class="line"></span><br><span class="line">                    self.move_hori_servo_motor(x_center - CENTER_POINT_X)</span><br><span class="line">                    self.move_vect_servo_motor(y_center - CENTER_POINT_Y)</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">break</span>  <span class="comment"># Only one face tracking at same time for now</span></span><br><span class="line"></span><br><span class="line">                self.lost_face_time = utime.ticks_ms()</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="comment"># Reset servo motor if lost detected face</span></span><br><span class="line">                <span class="keyword">if</span> utime.ticks_ms() - self.lost_face_time &gt; <span class="number">3000</span>:</span><br><span class="line">                    self.reset_servo_motor()</span><br><span class="line"></span><br><span class="line">            lcd.display(img)</span><br><span class="line">        <span class="keyword">except</span> KeyboardInterrupt:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">str</span>(e) == <span class="string">&quot;IDE interrupt&quot;</span>:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            print(e)</span><br></pre></td></tr></table></figure>
+
+<p>程序主循环，在每次循环开始或结束时，<strong>千万一定必须要执行 <code>gc.collect()</code> 来回收垃圾</strong>，否则有极大可能导致内存溢出程序崩溃。这部分代码在每次循环时从摄像头获取图像，执行识别，拍照存储，控制伺服电机等，具体可阅读代码（<del>没错就是我又懒得敲详细内容了</del>）。</p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>这次也是尝鲜，用 Python 写了一下 K210 的程序，发现 K210 确实很强大，便宜（单块 K210 BGA 封装只要 20 块不到）低功耗且性能强大，但是由于 Python 的性能问题导致无法跑高精度模型，下一步打算学习勘智的 C SDK 并尝试把这篇文章中写的东西复刻一下，提高一下自己 C 的水平。</p>
+
+        </div>
+
+        
+            <section class="post-copyright">
+                
+                    <p class="copyright-item">
+                        <span>Author:</span>
+                        <span>Nhelv</span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>Permalink:</span>
+                        <span><a href="https://nhe1v.github.io/2020/11/23/face-tracking-with-k210-and-servo-motor/">https://nhe1v.github.io/2020/11/23/face-tracking-with-k210-and-servo-motor/</a></span>
+                    </p>
+                
+                
+                    <p class="copyright-item">
+                        <span>License:</span>
+                        <span>Copyright (c) 2019 <a target="_blank" rel="noopener" href="http://creativecommons.org/licenses/by-nc/4.0/">CC-BY-NC-4.0</a> LICENSE</span>
+                    </p>
+                
+                
+                     <p class="copyright-item">
+                         <span>Slogan:</span>
+                         <span>Do you believe in <strong>DESTINY</strong>?</span>
+                     </p>
+                
+
+            </section>
+        
+        <section class="post-tags">
+            <div>
+                <span>Tag(s):</span>
+                <span class="tag">
+                    
+                    
+                        <a href="/tags/K210/"># K210</a>
+                    
+                        <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"># 嵌入式</a>
+                    
+                        <a href="/tags/MicroPython/"># MicroPython</a>
+                    
+                        
+                </span>
+            </div>
+            <div>
+                <a href="javascript:window.history.back();">back</a>
+                <span>· </span>
+                <a href="/">home</a>
+            </div>
+        </section>
+        <section class="post-nav">
+            
+            
+        </section>
+
+
+    </article>
+</div>
+
+        </div>
+        <footer id="footer" class="footer">
+    <div class="copyright">
+        <span>© Nhelv | Powered by <a href="https://hexo.io" target="_blank">Hexo</a> & <a href="https://github.com/Siricee/hexo-theme-Chic" target="_blank">Chic</a></span>
+    </div>
+</footer>
+
+    </div>
+</body>
+</html>
